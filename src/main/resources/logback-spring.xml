@@ -9,8 +9,9 @@
     </appender>
 
     <springProfile name="local">
-        <logger name="org.springframework" level="info"/>
-        <logger name="org.apache" level="info"/>
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="reactor" level="INFO" />
+        <logger name="io.netty" level="INFO"/>
 
         <root level="DEBUG">
             <appender-ref ref="stdout"/>

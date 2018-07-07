@@ -1,15 +1,18 @@
 package com.dongho.dev.web;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.web.bind.annotation.RequestMapping;
+import com.dongho.dev.web.protocol.Message;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 @RestController
-@EnableAutoConfiguration
 public class HelloController {
 
-	@RequestMapping("/")
-	String home() {
-		return "Hello World!";
+	@GetMapping("/")
+	public Flux<Message> getMessage() {
+		return Flux.just(
+			Message.builder().body("Hello Spring 5").build(),
+			Message.builder().body("Hello Spring Boot 2").build()
+		);
 	}
 }
