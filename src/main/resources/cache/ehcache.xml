@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+         updateCheck="false">
+
+    <!-- cache Settings
+        maxEntriesLocalHeap: Sets the maximum number of objects that will be created in memory.  0 = no limit.
+        maxEntriesLocalDisk: Sets the maximum number of objects that will be maintained in the DiskStore
+        eternal: Sets whether elements are eternal. If eternal, timeouts are ignored and the element is never expired.
+        diskSpoolBufferSizeMB: This is the size to allocate the DiskStore for a spool buffer. Writes are made to this area and then asynchronously written to disk. The default size is 30MB.
+        timeToIdleSeconds: Sets the time to idle for an element before it expires.
+        timeToLiveSeconds: Sets the time to live for an element before it expires.
+        memoryStoreEvictionPolicy: Policy would be enforced upon reaching the maxEntriesLocalHeap limit.
+        transactionalMode:  To enable an ehcache as transactions, set the transactionalMode
+    -->
+
+    <!--
+        cacheEventListenerFactory Settings
+        replicatePuts=true | false - whether new elements placed in a cache are replicated to others. Defaults to true.
+        replicateUpdates=true | false - whether new elements which override an element already existing with the same key are replicated. Defaults to true.
+        replicateRemovals=true - whether element removals are replicated. Defaults to true.
+        replicateAsynchronously=true | false - whether replications are asyncrhonous (true) or synchronous (false). Defaults to true.
+        replicateUpdatesViaCopy=true | false - whether the new elements are copied to other caches (true), or whether a remove message is sent. Defaults to true.
+    -->
+    <cacheManagerPeerProviderFactory
+        class="com.dongho.dev.support.ehcache.AutoRMICacheManagerPeerProviderFactory"
+        properties="peerDiscovery=manual,
+                    rmiUrls=//192.168.56.101:40001/launching|//10.77.29.40:40001/launching"
+    />
+
+    <cacheManagerPeerListenerFactory
+        class="net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory"
+        properties="hostName=localhost,
+                    port=40001,
+                    remoteObjectPort=41001,
+                    socketTimeoutMillis=2000"/>
+
+    <cache name="launching"
+        eternal="false"
+        maxEntriesLocalDisk="0"
+        maxEntriesLocalHeap="50000"
+        overflowToDisk="false"
+        diskPersistent="false"
+        timeToIdleSeconds="0"
+        timeToLiveSeconds="60"
+        memoryStoreEvictionPolicy="LRU">
+
+        <cacheEventListenerFactory
+            class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+            properties="replicateAsynchronously=true,
+                        replicatePuts=false,
+                        replicateUpdates=false,
+                        replicateUpdatesViaCopy=false,
+                        replicateRemovals=true "/>
+    </cache>
+</ehcache>
