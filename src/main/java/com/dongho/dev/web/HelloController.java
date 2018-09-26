@@ -65,6 +65,30 @@ public class HelloController {
                 );
     }
 
+
+    @GetMapping("/elasticMonoZip")
+    public Mono<String> onWithMonoZip() {
+        log.info("{}: start", Thread.currentThread().getName());
+        return Mono.fromCallable(() -> "publish")
+                .doOnNext(str -> log.info("{}: first", Thread.currentThread().getName()))
+                .flatMap(str -> Mono.defer(() -> {
+                    log.info("{}: before get user name", Thread.currentThread().getName());
+                    return userService.getUserName();
+                }))
+                .flatMap(str ->
+                        Mono.zip(Mono.fromCallable(() -> "noton")
+                                    .subscribeOn(Schedulers.elastic())
+                                    .doOnNext(t1 -> log.info("{}: t1", Thread.currentThread().getName())),
+                                Mono.fromCallable(() -> "WithMonoZip")
+                                    .subscribeOn(Schedulers.elastic())
+                                    .doOnNext(t1 -> log.info("{}: t2", Thread.currentThread().getName())),
+                                (t1, t2) -> {
+                                    log.info("{}: t1+t2", Thread.currentThread().getName());
+                                    return t1 + t2;
+                                })
+                );
+    }
+
 	@GetMapping("/subscribeon")
     public Mono<String> getSubsbribeOn() {
         log.info("{}: start", Thread.currentThread().getName());
