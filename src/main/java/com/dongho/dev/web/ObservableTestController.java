@@ -35,9 +35,11 @@ public class ObservableTestController {
     public Mono<Void> test1() {
         Observable1 observable = new Observable1();
 
-        Observer observer = (o, data) -> log.info("update: {}", data);
+        Observer observer1 = (o, data) -> log.info("update 1: {}", data);
+        Observer observer2 = (o, data) -> log.info("update 2: {}", data);
 
-        observable.addObserver(observer);
+        observable.addObserver(observer1);
+        observable.addObserver(observer2);
         observable.say();
 
         return Mono.empty();
