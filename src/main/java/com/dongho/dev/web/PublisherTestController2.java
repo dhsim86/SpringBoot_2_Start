@@ -7,9 +7,7 @@ import org.reactivestreams.Subscription;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.concurrent.Executors;
 
@@ -103,30 +101,6 @@ public class PublisherTestController2 {
         log.info("Start {}", Thread.currentThread().getName());
 
         pubOn.subscribe(subOn);
-        return Mono.empty();
-    }
-
-    @GetMapping("/reactor")
-    public Mono<String> reactor() {
-        Flux.range(1, 10)
-            .publishOn(Schedulers.newSingle("pub"))
-            .log()
-            .subscribeOn(Schedulers.newSingle("sub"))
-            .subscribe(n -> log.info("{}", n));
-
-        return Mono.empty();
-    }
-
-    @GetMapping("/reactor2")
-    public Mono<String> reactor2() {
-        Flux.defer(() -> {
-            log.info("Defer");
-            return Flux.range(1, 10);
-        }).publishOn(Schedulers.newSingle("pub"))
-            .log()
-            .subscribeOn(Schedulers.newSingle("sub"))
-            .subscribe(n -> log.info("{}", n));
-
         return Mono.empty();
     }
 
