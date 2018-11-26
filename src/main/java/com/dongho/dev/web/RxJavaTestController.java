@@ -1,10 +1,14 @@
 package com.dongho.dev.web;
 
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.plugins.RxJavaPlugins;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -107,6 +111,44 @@ public class RxJavaTestController {
             .subscribe(s -> log.info("on next: {}", s),
                        e -> log.error("on error:", e),
                        () -> log.info("completed"));
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/maybe")
+    public Mono<String> maybe() {
+        Maybe mayBe = Maybe.fromCallable(() -> "Maybe Test");
+        return RxJava2Adapter.maybeToMono(mayBe);
+    }
+
+    @GetMapping("/maybeNull")
+    public Mono<String> maybeNull() {
+        //onSubscribe (onSuccess | onError | onComplete)?
+
+        Maybe.fromCallable(() -> "Maybe Test")
+            .subscribe(s -> log.info("[Maybe] on success: {}", s),
+                       e -> log.error("[Maybe] on error:", e),
+                       () -> log.info("[Maybe] completed"));
+
+        Maybe.fromCallable(() -> null)
+            .subscribe(s -> log.info("[Maybe Null] on success: {}", s),
+                       e -> log.error("[Maybe Null] on error:", e),
+                       () -> log.info("[Maybe Null] completed"));
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/single")
+    public Mono<String> single() {
+        // onSubscribe (onSuccess | onError)?
+
+        Single.fromCallable(() -> "Single Test")
+            .subscribe(s -> log.info("[Single] on success: {}", s),
+                       e -> log.error("[Single] on error:", e));
+
+        Single.fromCallable(() -> null)
+            .subscribe(s -> log.info("[Single Null] on success: {}", s),
+                       e -> log.error("[Single Null] on error:", e));
 
         return Mono.empty();
     }

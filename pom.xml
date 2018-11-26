@@ -24,6 +24,7 @@
         <java.version>1.8</java.version>
 
         <rxjava.version>2.2.4</rxjava.version>
+        <reactor.adapter.version>3.2.0.RELEASE</reactor.adapter.version>
     </properties>
 
     <dependencies>
@@ -55,6 +56,11 @@
             <version>${rxjava.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.projectreactor.addons</groupId>
+            <artifactId>reactor-adapter</artifactId>
+            <version>${reactor.adapter.version}</version>
+        </dependency>
 
         <!-- Lombok -->
         <dependency>
