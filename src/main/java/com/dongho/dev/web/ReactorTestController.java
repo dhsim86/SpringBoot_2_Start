@@ -181,11 +181,11 @@ public class ReactorTestController {
 
         basksetFlux.log("basketListFlux").concatMap(basket -> {
             Flux<String> source =
-                Flux.fromIterable(basket).log("Hot Basket").subscribeOn(Schedulers.newSingle("sub")).publish().autoConnect(2);
+                Flux.fromIterable(basket).log("Hot Basket").publish().autoConnect(2).subscribeOn(Schedulers.newSingle("sub"));
 
-            Mono<List<String>> distinctFruits = source.log("FruitNameFlux").publishOn(Schedulers.parallel()).distinct().collectList();
+            Mono<List<String>> distinctFruits = source.publishOn(Schedulers.parallel()).log("FruitNameFlux").distinct().collectList();
 
-            Mono<Map<String, Long>> countFruitsMono = source.log("FruitCountFlux").publishOn(Schedulers.parallel())
+            Mono<Map<String, Long>> countFruitsMono = source.publishOn(Schedulers.parallel()).log("FruitCountFlux")
                 .groupBy(fruit -> fruit)
                 .concatMap(groupedFlux -> groupedFlux.log("GroupedFlux {" + groupedFlux.key() + "}").count()
                     .map(count -> {
