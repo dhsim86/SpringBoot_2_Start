@@ -117,4 +117,17 @@ public class PublisherTestController2 {
         return Mono.empty();
     }
 
+    @GetMapping("/reactor2")
+    public Mono<String> reactor2() {
+        Flux.defer(() -> {
+            log.info("Defer");
+            return Flux.range(1, 10);
+        }).publishOn(Schedulers.newSingle("pub"))
+            .log()
+            .subscribeOn(Schedulers.newSingle("sub"))
+            .subscribe(n -> log.info("{}", n));
+
+        return Mono.empty();
+    }
+
 }
