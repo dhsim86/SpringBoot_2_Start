@@ -126,14 +126,14 @@ public class RxJavaTestController {
         //onSubscribe (onSuccess | onError | onComplete)?
 
         Maybe.fromCallable(() -> "Maybe Test")
-            .subscribe(s -> log.info("[Maybe] on success: {}", s),
+            .subscribe(s -> log.info("[Maybe] on success: {}", s),      // onSuccess
                        e -> log.error("[Maybe] on error:", e),
                        () -> log.info("[Maybe] completed"));
 
         Maybe.fromCallable(() -> null)
             .subscribe(s -> log.info("[Maybe Null] on success: {}", s),
                        e -> log.error("[Maybe Null] on error:", e),
-                       () -> log.info("[Maybe Null] completed"));
+                       () -> log.info("[Maybe Null] completed"));       // onComplete
 
         return Mono.empty();
     }
@@ -143,12 +143,12 @@ public class RxJavaTestController {
         // onSubscribe (onSuccess | onError)?
 
         Single.fromCallable(() -> "Single Test")
-            .subscribe(s -> log.info("[Single] on success: {}", s),
+            .subscribe(s -> log.info("[Single] on success: {}", s),     // onSuccess
                        e -> log.error("[Single] on error:", e));
 
         Single.fromCallable(() -> null)
             .subscribe(s -> log.info("[Single Null] on success: {}", s),
-                       e -> log.error("[Single Null] on error:", e));
+                       e -> log.error("[Single Null] on error:", e));   // onError
 
         return Mono.empty();
     }
