@@ -3,7 +3,6 @@ package com.dongho.dev.web;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.plugins.RxJavaPlugins;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -149,6 +148,63 @@ public class RxJavaTestController {
         Single.fromCallable(() -> null)
             .subscribe(s -> log.info("[Single Null] on success: {}", s),
                        e -> log.error("[Single Null] on error:", e));   // onError
+
+        return Mono.empty();
+    }
+
+    private Single<String> trueString() {
+        log.info("trueString");
+        return Single.just("true");
+    }
+
+    private Single<String> falseString() {
+        log.info("falseString");
+        return Single.just("false");
+    }
+
+    @GetMapping("/maybe/switchIfEmptyTrue")
+    public Mono<String> switchIfEmptyTest() {
+        boolean is = true;
+
+        Single.fromCallable(() -> is)
+            .filter(Boolean::booleanValue)
+            .flatMap(b -> trueString().toMaybe())
+            .switchIfEmpty(falseString())
+            .subscribe();
+
+        // falseString
+        // trueString
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/maybe/switchIfEmptyTrueDefer")
+    public Mono<String> switchIfEmptyDeferTest() {
+        boolean is = true;
+
+        Single.fromCallable(() -> is)
+            .filter(Boolean::booleanValue)
+            .flatMap(b -> trueString().toMaybe())
+            .switchIfEmpty(Single.defer(() -> falseString()))
+            .subscribe();
+
+        // falseString
+        // trueString
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/maybe/switchIfEmptyFalse")
+    public Mono<String> switchIfEmptyFalseTest() {
+        boolean is = false;
+
+        Single.fromCallable(() -> is)
+            .filter(Boolean::booleanValue)
+            .flatMap(b -> trueString().toMaybe())
+            .switchIfEmpty(falseString())
+            .subscribe();
+
+        // falseString
 
         return Mono.empty();
     }

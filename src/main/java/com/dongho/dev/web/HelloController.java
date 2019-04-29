@@ -21,6 +21,7 @@ public class HelloController {
 
 	@GetMapping("/")
 	public Flux<Message> getMessage(StatementParameter parameter) {
+	    log.info("Got Message");
 		return Flux.just(
 			Message.builder().body("Hello Spring 5").build(),
 			Message.builder().body("Hello Spring Boot 2").build()
