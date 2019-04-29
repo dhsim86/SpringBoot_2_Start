@@ -22,10 +22,10 @@ public class ReactorTestController {
     @GetMapping("/publishon")
     public Mono<String> reactor() {
         Flux.range(1, 10)
-            .publishOn(Schedulers.newSingle("pub"))
-            .log()
-            .subscribeOn(Schedulers.newSingle("sub"))
-            .subscribe(n -> log.info("{}", n));
+                .publishOn(Schedulers.newSingle("pub"))
+                .log()
+                .subscribeOn(Schedulers.newSingle("sub"))
+                .subscribe(n -> log.info("{}", n));
 
         return Mono.empty();
     }
@@ -36,16 +36,16 @@ public class ReactorTestController {
             log.info("Defer");
             return Flux.range(1, 10);
         }).publishOn(Schedulers.newSingle("pub"))
-            .log()
-            .subscribeOn(Schedulers.newSingle("sub"))
-            .subscribe(n -> log.info("{}", n));
+                .log()
+                .subscribeOn(Schedulers.newSingle("sub"))
+                .subscribe(n -> log.info("{}", n));
 
         return Mono.empty();
     }
 
-    private final List<String> basket1 = Arrays.asList(new String[] {"kiwi", "orange", "lemon", "orange", "lemon", "kiwi"});
-    private final List<String> basket2 = Arrays.asList(new String[] {"banana", "lemon", "lemon", "kiwi"});
-    private final List<String> basket3 = Arrays.asList(new String[] {"strawberry", "orange", "lemon", "grape", "strawberry"});
+    private final List<String> basket1 = Arrays.asList(new String[]{"kiwi", "orange", "lemon", "orange", "lemon", "kiwi"});
+    private final List<String> basket2 = Arrays.asList(new String[]{"banana", "lemon", "lemon", "kiwi"});
+    private final List<String> basket3 = Arrays.asList(new String[]{"strawberry", "orange", "lemon", "grape", "strawberry"});
 
     private final List<List<String>> baskets = Arrays.asList(basket1, basket2, basket3);
 
@@ -66,7 +66,7 @@ public class ReactorTestController {
             if (o == null || getClass() != o.getClass())
                 return false;
 
-            FruitInfo fruitInfo = (FruitInfo)o;
+            FruitInfo fruitInfo = (FruitInfo) o;
 
             if (distinctFruits != null ? !distinctFruits.equals(fruitInfo.distinctFruits) : fruitInfo.distinctFruits != null)
                 return false;
@@ -83,9 +83,9 @@ public class ReactorTestController {
         @Override
         public String toString() {
             return "FruitInfo{" +
-                "distinctFruits=" + distinctFruits +
-                ", countFruits=" + countFruits +
-                '}';
+                    "distinctFruits=" + distinctFruits +
+                    ", countFruits=" + countFruits +
+                    '}';
         }
 
     }
@@ -98,18 +98,18 @@ public class ReactorTestController {
             Mono<List<String>> distinctFruits = Flux.fromIterable(basket).log("FruitNameFlux").distinct().collectList();
 
             Mono<Map<String, Long>> countFruitsMono = Flux.fromIterable(basket).log("FruitCountFlux")
-                .groupBy(fruit -> fruit)
-                .concatMap(groupedFlux -> groupedFlux.log("GroupedFlux {" + groupedFlux.key() + "}").count()
-                    .map(count -> {
-                        Map<String, Long> friutCount = new LinkedHashMap<>();
-                        friutCount.put(groupedFlux.key(), count);
-                        return friutCount;
-                    })
-                )
-                .reduce((accumulatedMap, currentMap) -> new LinkedHashMap<String, Long>() {{
-                    putAll(accumulatedMap);
-                    putAll(currentMap);
-                }});
+                    .groupBy(fruit -> fruit)
+                    .concatMap(groupedFlux -> groupedFlux.log("GroupedFlux {" + groupedFlux.key() + "}").count()
+                            .map(count -> {
+                                Map<String, Long> friutCount = new LinkedHashMap<>();
+                                friutCount.put(groupedFlux.key(), count);
+                                return friutCount;
+                            })
+                    )
+                    .reduce((accumulatedMap, currentMap) -> new LinkedHashMap<String, Long>() {{
+                        putAll(accumulatedMap);
+                        putAll(currentMap);
+                    }});
 
             return Flux.zip(distinctFruits, countFruitsMono, (distinct, count) -> new FruitInfo(distinct, count));
         }).subscribe(info -> log.info("Info: {}\n", info));
@@ -123,22 +123,22 @@ public class ReactorTestController {
 
         basksetFlux.log("basketListFlux").concatMap(basket -> {
             Mono<List<String>> distinctFruits =
-                Flux.fromIterable(basket).log("FruitNameFlux").distinct().collectList().subscribeOn(Schedulers.parallel());
+                    Flux.fromIterable(basket).log("FruitNameFlux").distinct().collectList().subscribeOn(Schedulers.parallel());
 
             Mono<Map<String, Long>> countFruitsMono = Flux.fromIterable(basket).log("FruitCountFlux")
-                .groupBy(fruit -> fruit)
-                .concatMap(groupedFlux -> groupedFlux.log("GroupedFlux {" + groupedFlux.key() + "}").count()
-                    .map(count -> {
-                        Map<String, Long> friutCount = new LinkedHashMap<>();
-                        friutCount.put(groupedFlux.key(), count);
-                        return friutCount;
-                    })
-                )
-                .reduce((accumulatedMap, currentMap) -> new LinkedHashMap<String, Long>() {{
-                    putAll(accumulatedMap);
-                    putAll(currentMap);
-                }})
-                .subscribeOn(Schedulers.parallel());
+                    .groupBy(fruit -> fruit)
+                    .concatMap(groupedFlux -> groupedFlux.log("GroupedFlux {" + groupedFlux.key() + "}").count()
+                            .map(count -> {
+                                Map<String, Long> friutCount = new LinkedHashMap<>();
+                                friutCount.put(groupedFlux.key(), count);
+                                return friutCount;
+                            })
+                    )
+                    .reduce((accumulatedMap, currentMap) -> new LinkedHashMap<String, Long>() {{
+                        putAll(accumulatedMap);
+                        putAll(currentMap);
+                    }})
+                    .subscribeOn(Schedulers.parallel());
 
             return Flux.zip(distinctFruits, countFruitsMono, (distinct, count) -> new FruitInfo(distinct, count));
         }).subscribe(info -> log.info("Info: {}\n", info));
@@ -156,18 +156,18 @@ public class ReactorTestController {
             Mono<List<String>> distinctFruits = source.log("FruitNameFlux").distinct().collectList();
 
             Mono<Map<String, Long>> countFruitsMono = source.log("FruitCountFlux")
-                .groupBy(fruit -> fruit)
-                .concatMap(groupedFlux -> groupedFlux.log("GroupedFlux {" + groupedFlux.key() + "}").count()
-                    .map(count -> {
-                        Map<String, Long> friutCount = new LinkedHashMap<>();
-                        friutCount.put(groupedFlux.key(), count);
-                        return friutCount;
-                    })
-                )
-                .reduce((accumulatedMap, currentMap) -> new LinkedHashMap<String, Long>() {{
-                    putAll(accumulatedMap);
-                    putAll(currentMap);
-                }});
+                    .groupBy(fruit -> fruit)
+                    .concatMap(groupedFlux -> groupedFlux.log("GroupedFlux {" + groupedFlux.key() + "}").count()
+                            .map(count -> {
+                                Map<String, Long> friutCount = new LinkedHashMap<>();
+                                friutCount.put(groupedFlux.key(), count);
+                                return friutCount;
+                            })
+                    )
+                    .reduce((accumulatedMap, currentMap) -> new LinkedHashMap<String, Long>() {{
+                        putAll(accumulatedMap);
+                        putAll(currentMap);
+                    }});
 
             return Flux.zip(distinctFruits, countFruitsMono, (distinct, count) -> new FruitInfo(distinct, count));
         }).subscribe(info -> log.info("Info: {}\n", info));
@@ -181,28 +181,72 @@ public class ReactorTestController {
 
         basksetFlux.log("basketListFlux").concatMap(basket -> {
             Flux<String> source =
-                Flux.fromIterable(basket).log("Hot Basket").publish().autoConnect(2).subscribeOn(Schedulers.newSingle("sub"));
+                    Flux.fromIterable(basket).log("Hot Basket").publish().autoConnect(2).subscribeOn(Schedulers.newSingle("sub"));
 
             Mono<List<String>> distinctFruits = source.publishOn(Schedulers.parallel()).log("FruitNameFlux").distinct().collectList();
 
             Mono<Map<String, Long>> countFruitsMono = source.publishOn(Schedulers.parallel()).log("FruitCountFlux")
-                .groupBy(fruit -> fruit)
-                .concatMap(groupedFlux -> groupedFlux.log("GroupedFlux {" + groupedFlux.key() + "}").count()
-                    .map(count -> {
-                        Map<String, Long> friutCount = new LinkedHashMap<>();
-                        friutCount.put(groupedFlux.key(), count);
-                        return friutCount;
-                    })
-                )
-                .reduce((accumulatedMap, currentMap) -> new LinkedHashMap<String, Long>() {{
-                    putAll(accumulatedMap);
-                    putAll(currentMap);
-                }});
+                    .groupBy(fruit -> fruit)
+                    .concatMap(groupedFlux -> groupedFlux.log("GroupedFlux {" + groupedFlux.key() + "}").count()
+                            .map(count -> {
+                                Map<String, Long> friutCount = new LinkedHashMap<>();
+                                friutCount.put(groupedFlux.key(), count);
+                                return friutCount;
+                            })
+                    )
+                    .reduce((accumulatedMap, currentMap) -> new LinkedHashMap<String, Long>() {{
+                        putAll(accumulatedMap);
+                        putAll(currentMap);
+                    }});
 
             return Flux.zip(distinctFruits, countFruitsMono, (distinct, count) -> new FruitInfo(distinct, count));
         }).subscribe(info -> log.info("Info: {}\n", info));
 
         return Mono.empty();
+    }
+
+    public Mono<String> returnTrueString() {
+        log.info("returnTrueString");
+        return Mono.just("true");
+    }
+
+    public Mono<String> returnFalseString() {
+        log.info("returnFalseString");
+        return Mono.just("false");
+    }
+
+    @GetMapping("/mono/switchIfEmptyTrue")
+    public Mono<String> switchIfEmptyTest() {
+        boolean is = true;
+
+        // returnFalseString
+        // returnTrueString
+        return Mono.fromSupplier(() -> is)
+                .filter(Boolean::booleanValue)
+                .flatMap(b -> returnTrueString())
+                .switchIfEmpty(returnFalseString());
+    }
+
+    @GetMapping("/mono/switchIfEmptyFalseTest")
+    public Mono<String> switchIfEmptyFalseTest() {
+        boolean is = false;
+
+        // returnFalseString
+        return Mono.fromSupplier(() -> is)
+                .filter(Boolean::booleanValue)
+                .flatMap(b -> returnTrueString())
+                .switchIfEmpty(returnFalseString());
+    }
+
+    @GetMapping("/mono/switchIfEmptyDeferTest")
+    public Mono<String> switchIfEmptyDeferTest() {
+        boolean is = true;
+
+        // returnTrueString
+        return Mono.fromSupplier(() -> is)
+                .filter(Boolean::booleanValue)
+                .flatMap(b -> returnTrueString())
+                .switchIfEmpty(Mono.defer(() -> returnFalseString()));
     }
 
 }
