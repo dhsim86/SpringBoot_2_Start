@@ -48,6 +48,7 @@ public class AopServiceWithJdkProxyTest {
         }
 
         then: {
+            // Not Proxied.
             assertThat(aopObject.getValue().get()).isEqualTo(0);
         }
     }
@@ -63,6 +64,10 @@ public class AopServiceWithJdkProxyTest {
 
         then: {
             assertThat(aopObject.getValue().get()).isEqualTo(1);
+            assertThat(aopObject.isFoundAnnotationOnClass()).isFalse();
+
+            // Can't find annotation info from interface method.
+            assertThat(aopObject.isFoundAnnotationOnMethod()).isFalse();
         }
     }
 
@@ -77,6 +82,10 @@ public class AopServiceWithJdkProxyTest {
 
         then: {
             assertThat(aopObject.getValue().get()).isEqualTo(1);
+            assertThat(aopObject.isFoundAnnotationOnClass()).isFalse();
+
+            // Can find annotation info from interface method using JDK proxy.
+            assertThat(aopObject.isFoundAnnotationOnMethod()).isTrue();
         }
     }
 

@@ -2,11 +2,14 @@ package com.dongho.dev.domain.aop;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
@@ -34,13 +37,30 @@ public class AopObject {
 
 
     @Before("executionOfAnyPublicMethodInAtAopTestType() || executionOfAopTestMethod()")
-    public void woved() {
+    public void beforeWoved(JoinPoint joinPoint) {
+        Class<?> clazz = joinPoint.getTarget().getClass();
+        Method method = ((MethodSignature)joinPoint.getSignature()).getMethod();
+
         value.incrementAndGet();
+
+        AopTest aopTestAnnotationOnClass = clazz.getAnnotation(AopTest.class);
+        if (aopTestAnnotationOnClass == null) {
+            foundAnnotationOnClass = false;
+        }
+
+        AopTest aopTestAnnotationOnMethod = method.getAnnotation(AopTest.class);
+        if (aopTestAnnotationOnMethod == null) {
+            foundAnnotationOnMethod = false;
+        }
     }
 
     private AtomicInteger value = new AtomicInteger();
+    private boolean foundAnnotationOnClass = true;
+    private boolean foundAnnotationOnMethod = true;
 
     public void reset() {
+        foundAnnotationOnClass = true;
+        foundAnnotationOnMethod = true;
         value.set(0);
     }
 

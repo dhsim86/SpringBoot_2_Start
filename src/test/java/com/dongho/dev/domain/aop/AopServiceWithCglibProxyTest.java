@@ -47,6 +47,7 @@ public class AopServiceWithCglibProxyTest {
         }
 
         then: {
+            // Not Proxied.
             assertThat(aopObject.getValue().get()).isEqualTo(0);
         }
     }
@@ -62,6 +63,10 @@ public class AopServiceWithCglibProxyTest {
 
         then: {
             assertThat(aopObject.getValue().get()).isEqualTo(1);
+            assertThat(aopObject.isFoundAnnotationOnClass()).isFalse();
+
+            // Can find annotation info from child concrete class's method using CGLib.
+            assertThat(aopObject.isFoundAnnotationOnMethod()).isTrue();
         }
     }
 
@@ -76,6 +81,10 @@ public class AopServiceWithCglibProxyTest {
 
         then: {
             assertThat(aopObject.getValue().get()).isEqualTo(1);
+            assertThat(aopObject.isFoundAnnotationOnClass()).isFalse();
+
+            // Can find annotation info from child concrete class's method using CGLib.
+            assertThat(aopObject.isFoundAnnotationOnMethod()).isTrue();
         }
     }
 

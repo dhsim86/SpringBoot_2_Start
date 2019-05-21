@@ -49,6 +49,11 @@ public class ClassOnlyServiceJdkProxyTest {
 
         then: {
             assertThat(aopObject.getValue().get()).isEqualTo(1);
+
+            // Can find annotation info from target.
+            assertThat(aopObject.isFoundAnnotationOnClass()).isTrue();
+
+            assertThat(aopObject.isFoundAnnotationOnMethod()).isFalse();
         }
     }
 
