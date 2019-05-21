@@ -89,4 +89,19 @@ public class AopServiceWithJdkProxyTest {
         }
     }
 
+    @Test
+    public void noProxyTest() {
+        given: {
+        }
+
+        when: {
+            aopService.noProxy();
+        }
+
+        then: {
+            // Not Proxied.
+            assertThat(aopObject.getValue().get()).isEqualTo(0);
+        }
+    }
+
 }

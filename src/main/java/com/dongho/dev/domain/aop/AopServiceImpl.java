@@ -22,4 +22,9 @@ public class AopServiceImpl implements AopService {
 
     }
 
+    @Override
+    public void noProxy() {
+
+    }
+
 }

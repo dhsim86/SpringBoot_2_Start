@@ -10,4 +10,6 @@ public interface AopService {
     @AopTest
     void parentChildBoth();
 
+    void noProxy();
+
 }
