@@ -3,6 +3,7 @@ package com.dongho.dev.domain.aop;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -33,6 +34,8 @@ public class ClassOnlyServiceJdkProxyTest {
     public void springDiTest() {
         assertThat(classOnlyService).isNotNull();
         assertThat(classOnlyServiceImpl).isNull();
+
+        assertThat(AopUtils.isJdkDynamicProxy(classOnlyService)).isTrue();
     }
 
     @Test
