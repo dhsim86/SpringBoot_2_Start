@@ -188,7 +188,6 @@ public class RxJavaTestController {
             .switchIfEmpty(Single.defer(() -> falseString()))
             .subscribe();
 
-        // falseString
         // trueString
 
         return Mono.empty();
