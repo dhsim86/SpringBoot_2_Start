@@ -260,4 +260,78 @@ public class RxJavaTestController {
         return Mono.empty();
     }
 
+    @GetMapping("/filterTest/true")
+    public Mono<String> filterTest() {
+        boolean is = true;
+
+        Single.fromCallable(() -> is)
+            .filter(Boolean::booleanValue)
+            .flatMap(b -> Single.fromCallable(() -> "test")
+                .doOnSuccess(s -> log.info("doOnSuccess: {}", s)).toMaybe())
+            .switchIfEmpty(Single.defer(() -> falseString()))
+            .doOnSuccess(s -> log.info("result: {}", s))
+            .subscribe();
+
+        // doOnSuccess: test
+        // result: test
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/filterTest/false")
+    public Mono<String> filterTestFalse() {
+        boolean is = false;
+
+        Single.fromCallable(() -> is)
+            .filter(Boolean::booleanValue)
+            .flatMap(b -> Single.fromCallable(() -> "test")
+                .doOnSuccess(s -> log.info("doOnSuccess: {}", s)).toMaybe())
+            .switchIfEmpty(Single.defer(() -> falseString()))
+            .doOnSuccess(s -> log.info("result: {}", s))
+            .subscribe();
+
+        // falseString
+        // result: false
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/filterTest/map")
+    public Mono<String> filterTestMapForm() {
+        boolean is = false;
+
+        Single.fromCallable(() -> is)
+            .filter(Boolean::booleanValue)
+            .map(b -> "test")
+            .doOnSuccess(s -> log.info("doOnSuccess: {}", s))
+            .switchIfEmpty(Single.defer(() -> falseString()))
+            .doOnSuccess(s -> log.info("result: {}", s))
+            .subscribe();
+
+        // falseString
+        // result: false
+
+        return Mono.empty();
+
+    }
+
+    @GetMapping("/filterTest/maybeFlatMap")
+    public Mono<String> filterTestMaybeFlatMapForm() {
+        boolean is = false;
+
+        Single.fromCallable(() -> is)
+            .filter(Boolean::booleanValue)
+            .flatMap(b -> Single.fromCallable(() -> "test").toMaybe())
+            .doOnSuccess(s -> log.info("doOnSuccess: {}", s))
+            .switchIfEmpty(Single.defer(() -> falseString()))
+            .doOnSuccess(s -> log.info("result: {}", s))
+            .subscribe();
+
+        // falseString
+        // result: false
+
+        return Mono.empty();
+
+    }
+
 }
