@@ -334,4 +334,23 @@ public class RxJavaTestController {
 
     }
 
+    @GetMapping("/filterTest/FlowableFlatMap")
+    public Mono<String> filterTestFlowableFlatMapForm() {
+        boolean is = false;
+
+        Single.fromCallable(() -> is)
+            .filter(Boolean::booleanValue)
+            .flatMap(b -> Flowable.fromIterable(Arrays.asList("1", "2", "3")).toList().toMaybe())
+            .doOnSuccess(s -> log.info("doOnSuccess: {}", s))
+            .switchIfEmpty(Single.defer(() -> falseString().toFlowable().toList()))
+            .doOnSuccess(s -> log.info("result: {}", s))
+            .subscribe();
+
+        // falseString
+        // result: [false]
+
+        return Mono.empty();
+
+    }
+
 }
