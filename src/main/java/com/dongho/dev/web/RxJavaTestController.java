@@ -1,5 +1,6 @@
 package com.dongho.dev.web;
 
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -204,6 +205,57 @@ public class RxJavaTestController {
             .subscribe();
 
         // falseString
+
+        return Mono.empty();
+    }
+
+    private List<String> stringList() {
+        log.info("stringList");
+        return Arrays.asList("test", "test2");
+    }
+
+    @GetMapping("/flowable/iterable")
+    public Mono<String> flowableIterableTest() {
+
+        Single.fromCallable(() -> 1)
+            .doOnSuccess(v -> log.info("before"))
+            .flatMapPublisher(v -> Flowable.fromIterable(stringList()))
+            .doOnNext(v -> log.info(v))
+            .subscribe();
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/flowable/fromSingleZip")
+    public Mono<String> flowableFromSingleZipTest() {
+
+        Single.fromCallable(() -> 1)
+            .doOnSuccess(v -> log.info("before"))
+            .flatMap(v -> Single.zip(Flowable.fromIterable(stringList()).toList(),
+                                     Single.fromCallable(() -> 1),
+                                     (list, v2) -> true))
+            .subscribe();
+
+        // before
+        // stringList
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/flowable/fromSingleZipFilter")
+    public Mono<String> flowableFromSingleZipFilterTest() {
+        boolean is = true;
+
+        Single.fromCallable(() -> is)
+            .doOnSuccess(v -> log.info("before"))
+            .filter(Boolean::booleanValue)
+            .switchIfEmpty(Single.zip(Flowable.fromIterable(stringList()).toList(),
+                                      Single.fromCallable(() -> 1),
+                                      (list, v2) -> true))
+            .subscribe();
+
+        // stringList
+        // before
 
         return Mono.empty();
     }
