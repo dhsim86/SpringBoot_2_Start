@@ -353,4 +353,54 @@ public class RxJavaTestController {
 
     }
 
+    @GetMapping("/concatArrayTest/delay")
+    public Mono<String> concatArrayTestForDelay() {
+
+        Single.concatArray(Single.fromCallable(() -> 1)
+                               .doOnSuccess(n -> log.info("first emit before delay {}", n))
+                               .delay(5, TimeUnit.SECONDS)
+                               .doOnSuccess(n -> log.info("first emit after delay {}", n)),
+                           Single.fromCallable(() -> 2)
+                               .doOnSuccess(n -> log.info("second emit before delay {}", n))
+                               .delay(5, TimeUnit.SECONDS)
+                               .doOnSuccess(n -> log.info("second emit after delay {}", n)))
+            .doOnNext(n -> log.info("after concat array. {}", n))
+            .subscribe();
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/concatArrayTest/delay2")
+    public Mono<String> concatArrayTestForDelay2() {
+
+        Single.concatArray(Single.fromCallable(() -> true)
+                               .doOnSuccess(n -> log.info("first emit {}", n)),
+                           Single.fromCallable(() -> true)
+                               .delay(5, TimeUnit.SECONDS)
+                               .doOnSuccess(n -> log.info("second emit {}", n)))
+            .all(Boolean::booleanValue)
+            .doOnSuccess(result -> log.info("result: {}", result))
+            .subscribe();
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/zipTest/delay")
+    public Mono<String> zipTestForDelay() {
+
+        Single.zip(Single.fromCallable(() -> 1)
+                       .doOnSuccess(n -> log.info("first emit before delay {}", n))
+                       .delay(5, TimeUnit.SECONDS)
+                       .doOnSuccess(n -> log.info("first emit after delay {}", n)),
+                   Single.fromCallable(() -> 2)
+                       .doOnSuccess(n -> log.info("second emit before delay {}", n))
+                       .delay(5, TimeUnit.SECONDS)
+                       .doOnSuccess(n -> log.info("second emit after delay {}", n)),
+                   (n, n2) -> n + n2)
+            .doOnSuccess(sum -> log.info("after zip. {}", sum))
+            .subscribe();
+
+        return Mono.empty();
+    }
+
 }
