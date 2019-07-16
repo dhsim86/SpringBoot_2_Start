@@ -1,5 +1,6 @@
 package com.dongho.dev.web;
 
+import com.sun.tools.javac.comp.Flow;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
@@ -17,6 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -374,9 +376,9 @@ public class RxJavaTestController {
     public Mono<String> concatArrayTestForDelay2() {
 
         Single.concatArray(Single.fromCallable(() -> true)
-                               .doOnSuccess(n -> log.info("first emit {}", n)),
+                               .doOnSuccess(n -> log.info("first emit {}", n))
+                               .delay(5, TimeUnit.SECONDS),
                            Single.fromCallable(() -> true)
-                               .delay(5, TimeUnit.SECONDS)
                                .doOnSuccess(n -> log.info("second emit {}", n)))
             .all(Boolean::booleanValue)
             .doOnSuccess(result -> log.info("result: {}", result))
@@ -399,6 +401,46 @@ public class RxJavaTestController {
                    (n, n2) -> n + n2)
             .doOnSuccess(sum -> log.info("after zip. {}", sum))
             .subscribe();
+
+        return Mono.empty();
+    }
+
+    public List<String> filter(List<String> list1, List<String> list2) {
+        return list1.stream()
+            .filter(str -> list2.stream().anyMatch(str2 -> str2.equals(str)))
+            .collect(Collectors.toList());
+    }
+
+    @GetMapping("/filterMaybe/test")
+    public Mono<String> filterMaybe() {
+
+        List<String> users = Arrays.asList("ab", "cd");
+        List<String> usersFromCab = Arrays.asList("ab", "cd");
+        List<String> admins = Arrays.asList("admin");
+
+        Single.fromCallable(() -> true)
+            .filter(Boolean::booleanValue)
+            .flatMap(result -> Flowable.fromIterable(usersFromCab)
+                .toList()
+                .map(cabList -> filter(users, cabList))
+                .toMaybe())
+            .defaultIfEmpty(users)
+            .doOnSuccess(list -> log.info("{}", list))
+            .subscribe();
+
+        // [ab, cd]
+
+        Single.fromCallable(() -> false)
+            .filter(Boolean::booleanValue)
+            .flatMap(result -> Flowable.fromIterable(usersFromCab)
+                .toList()
+                .map(cabList -> filter(admins, cabList))
+                .toMaybe())
+            .defaultIfEmpty(admins)
+            .doOnSuccess(list -> log.info("{}", list))
+            .subscribe();
+
+        // [admin]
 
         return Mono.empty();
     }
