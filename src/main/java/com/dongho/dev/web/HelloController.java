@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 @Slf4j
@@ -151,4 +150,48 @@ public class HelloController {
                     return tuple.getT1() + tuple.getT2();
                 });
     }
+
+    private String nullReturn() {
+        log.info("nullReturn");
+        return null;
+    }
+
+    private Mono<String> trueString() {
+        log.info("trueString");
+        return Mono.just("true");
+    }
+
+    private Mono<String> falseString() {
+        log.info("falseString");
+        return Mono.just("false");
+    }
+
+    @GetMapping("/mono/switchIfEmptyNull")
+    public Mono<String> switchIfEmptyNullTest() {
+        Mono.fromCallable(() -> nullReturn())
+            .switchIfEmpty(falseString())
+            .subscribe();
+
+        // falseString
+        // trueString
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/mono/switchIfEmptyTrue")
+    public Mono<String> switchIfEmptyFilterTest() {
+        boolean is = true;
+
+        Mono.fromCallable(() -> is)
+                .filter(Boolean::booleanValue)
+                .flatMap(b -> trueString())
+                .switchIfEmpty(falseString())
+                .subscribe();
+
+        // falseString
+        // trueString
+
+        return Mono.empty();
+    }
+
 }
