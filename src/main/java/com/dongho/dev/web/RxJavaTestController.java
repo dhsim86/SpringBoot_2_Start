@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -516,6 +517,34 @@ public class RxJavaTestController {
 
         // [reactor-http-nio-2] before subscribe
         // [reactor-http-nio-2] success: test
+        // [reactor-http-nio-2] after subscribe
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/subscribe/exception")
+    public Mono<String> subscribeException() {
+
+        log.info("before subscribe");
+
+        RuntimeException[] results = new RuntimeException[] { null };
+
+        Single.fromCallable(() -> null)
+            .doOnSuccess(s -> log.info("success: {}", s))
+            .subscribe(result -> {}, e -> results[0] = new RuntimeException(e));
+
+        try {
+            if (Objects.isNull(results[0]) == false) {
+                throw results[0];
+            }
+        } catch (Exception e) {
+            log.error("error occur.");
+        }
+
+        log.info("after subscribe");
+
+        // [reactor-http-nio-2] before subscribe
+        // [reactor-http-nio-2] error occur.
         // [reactor-http-nio-2] after subscribe
 
         return Mono.empty();
