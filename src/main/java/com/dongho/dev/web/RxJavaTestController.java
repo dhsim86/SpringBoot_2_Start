@@ -4,6 +4,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -444,4 +445,79 @@ public class RxJavaTestController {
         return Mono.empty();
     }
 
+    @GetMapping("/subscribe/normal")
+    public Mono<String> subscribeNormal() {
+
+        log.info("before subscribe");
+
+        Single.fromCallable(() -> "test")
+            .doOnSuccess(s -> log.info("success: {}", s))
+            .subscribe();
+
+        log.info("after subscribe");
+
+        // [reactor-http-nio-2] before subscribe
+        // [reactor-http-nio-2] success: test
+        // [reactor-http-nio-2] after subscribe
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/subscribe/trampoline")
+    public Mono<String> subscribeTrampoline() {
+
+        log.info("before subscribe");
+
+        Single.fromCallable(() -> "test")
+            .doOnSuccess(s -> log.info("success: {}", s))
+            .subscribeOn(Schedulers.trampoline())
+            .subscribe();
+
+        log.info("after subscribe");
+
+        // [reactor-http-nio-2] before subscribe
+        // [reactor-http-nio-2] success: test
+        // [reactor-http-nio-2] after subscribe
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/subscribe/normalDelay")
+    public Mono<String> subscribeNormalDelay() {
+
+        log.info("before subscribe");
+
+        Single.fromCallable(() -> "test")
+            .delay(5000, TimeUnit.MILLISECONDS)
+            .doOnSuccess(s -> log.info("success: {}", s))
+            .subscribe();
+
+        log.info("after subscribe");
+
+        // [reactor-http-nio-2] before subscribe
+        // [reactor-http-nio-2] after subscribe
+        // [RxComputationThreadPool-1] success: test
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/subscribe/blockingDelay")
+    public Mono<String> subscribeBlocking() {
+
+        log.info("before subscribe");
+
+        Single.fromCallable(() -> "test")
+            .delay(5000, TimeUnit.MILLISECONDS, Schedulers.trampoline())
+            .doOnSuccess(s -> log.info("success: {}", s))
+            .subscribeOn(Schedulers.trampoline())
+            .subscribe();
+
+        log.info("after subscribe");
+
+        // [reactor-http-nio-2] before subscribe
+        // [reactor-http-nio-2] success: test
+        // [reactor-http-nio-2] after subscribe
+
+        return Mono.empty();
+    }
 }
