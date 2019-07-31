@@ -527,11 +527,12 @@ public class RxJavaTestController {
 
         log.info("before subscribe");
 
-        RuntimeException[] results = new RuntimeException[] { null };
+        RuntimeException[] results = new RuntimeException[] {null};
 
         Single.fromCallable(() -> null)
             .doOnSuccess(s -> log.info("success: {}", s))
-            .subscribe(result -> {}, e -> results[0] = new RuntimeException(e));
+            .subscribe(result -> {
+            }, e -> results[0] = new RuntimeException(e));
 
         try {
             if (Objects.isNull(results[0]) == false) {
@@ -572,4 +573,60 @@ public class RxJavaTestController {
 
         return Mono.empty();
     }
+
+    @GetMapping("/subscribe/exception/blockingAwait/delay")
+    public Mono<String> subscribeExceptionBlockingAwaitDelay() {
+
+        log.info("before subscribe");
+
+        try {
+            Single.fromCallable(() -> "test")
+                .delay(5000, TimeUnit.MILLISECONDS)
+                .doOnSuccess(s -> log.info("success: {}", s))
+                .flatMap(s -> Single.fromCallable(() -> null)
+                    .doOnSuccess(v -> log.info("success: {}", s)))
+                .ignoreElement()
+                .blockingAwait();
+        } catch (Exception e) {
+            log.error("error occur.");
+        }
+
+        log.info("after subscribe");
+
+        // [reactor-http-nio-2] before subscribe
+        // [RxComputationThreadPool-1] success: test
+        // [reactor-http-nio-2] error occur.
+        // [reactor-http-nio-2] after subscribe
+
+        return Mono.empty();
+    }
+
+    @GetMapping("/subscribe/exception/blockingAwait/delay/trampoline")
+    public Mono<String> subscribeExceptionBlockingAwaitDelayTrampoline() {
+
+        log.info("before subscribe");
+
+        try {
+            Single.fromCallable(() -> "test")
+                .delay(5000, TimeUnit.MILLISECONDS, Schedulers.trampoline())
+                .doOnSuccess(s -> log.info("success: {}", s))
+                .flatMap(s -> Single.fromCallable(() -> null)
+                    .doOnSuccess(v -> log.info("success: {}", s)))
+                .subscribeOn(Schedulers.trampoline())
+                .ignoreElement()
+                .blockingAwait();
+        } catch (Exception e) {
+            log.error("error occur.");
+        }
+
+        log.info("after subscribe");
+
+        // [reactor-http-nio-2] before subscribe
+        // [reactor-http-nio-2] success: test
+        // [reactor-http-nio-2] error occur.
+        // [reactor-http-nio-2] after subscribe
+
+        return Mono.empty();
+    }
+
 }
