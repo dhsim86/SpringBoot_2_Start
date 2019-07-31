@@ -549,4 +549,27 @@ public class RxJavaTestController {
 
         return Mono.empty();
     }
+
+    @GetMapping("/subscribe/exception/blockingAwait")
+    public Mono<String> subscribeExceptionBlockingAwait() {
+
+        log.info("before subscribe");
+
+        try {
+            Single.fromCallable(() -> null)
+                .doOnSuccess(s -> log.info("success: {}", s))
+                .ignoreElement()
+                .blockingAwait();
+        } catch (Exception e) {
+            log.error("error occur.");
+        }
+
+        log.info("after subscribe");
+
+        // [reactor-http-nio-2] before subscribe
+        // [reactor-http-nio-2] error occur.
+        // [reactor-http-nio-2] after subscribe
+
+        return Mono.empty();
+    }
 }
