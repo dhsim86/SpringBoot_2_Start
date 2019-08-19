@@ -29,7 +29,7 @@ public class UserRepositoryTest {
     @SneakyThrows
     public void prepare() {
         Connection connection = DriverManager.getConnection(
-            "jdbc:mysql://10.161.64.68:13306?useUnicode=true&characterEncoding=UTF-8&useSSL=true&verifyServerCertificate=false",
+            "jdbc:mysql://10.32.195.52:5605?useUnicode=true&characterEncoding=UTF-8&useSSL=true&verifyServerCertificate=false",
             "tc_rds",
             "rds!#%135"
         );
@@ -48,7 +48,7 @@ public class UserRepositoryTest {
     @SneakyThrows
     public void clean() {
         Connection connection = DriverManager.getConnection(
-            "jdbc:mysql://10.161.64.68:13306?useUnicode=true&characterEncoding=UTF-8&useSSL=true&verifyServerCertificate=false",
+            "jdbc:mysql://10.32.195.52:5605?useUnicode=true&characterEncoding=UTF-8&useSSL=true&verifyServerCertificate=false",
             "tc_rds",
             "rds!#%135"
         );
