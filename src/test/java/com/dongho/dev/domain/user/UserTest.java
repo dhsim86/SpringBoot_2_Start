@@ -54,6 +54,7 @@ public class UserTest {
             assertThat(optUser.map(User::getId).get()).isEqualTo(user.getId());
             assertThat(optUser.map(User::getName).get()).isEqualTo(user.getName());
             assertThat(optUser.map(User::getAge).get()).isEqualTo(user.getAge());
+            assertThat(optUser.map(User::getRepository).get()).isNotNull();
         }
     }
 
