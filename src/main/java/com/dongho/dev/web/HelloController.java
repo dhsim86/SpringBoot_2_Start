@@ -10,6 +10,6 @@ public class HelloController {
 
 	@RequestMapping("/")
 	String home() {
-		return "jenkins webhook test!";
+		return "jenkins webhook test2!";
 	}
 }
