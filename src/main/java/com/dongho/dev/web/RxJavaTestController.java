@@ -1,10 +1,9 @@
 package com.dongho.dev.web;
 
-import io.reactivex.Flowable;
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.Single;
+import io.reactivex.*;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -626,6 +625,64 @@ public class RxJavaTestController {
         // [reactor-http-nio-2] error occur.
         // [reactor-http-nio-2] after subscribe
 
+        return Mono.empty();
+    }
+
+    private Observer<Integer> integerSingleObserver = new Observer<Integer>() {
+        @Override public void onSubscribe(Disposable d) {
+
+        }
+
+        @Override public void onNext(Integer integer) {
+            log.info("item: {}", integer);
+        }
+
+        @Override public void onComplete() {
+
+        }
+
+        @Override public void onError(Throwable e) {
+
+        }
+    };
+
+    @GetMapping("/subscribe/subject/publishSubject")
+    public Mono<String> subscribePublishSubject() {
+        PublishSubject<Integer> subject = PublishSubject.create();
+        subject.subscribe(integerSingleObserver);
+
+        subject.onNext(1);
+        subject.onNext(2);
+
+        subject.onComplete();
+
+        //subject.onNext(3);
+
+        //2019-12-16 13:29:31 | INFO  | RxJavaTestController               :637  | [reactor-http-nio-2] item: 1
+        //2019-12-16 13:29:31 | INFO  | RxJavaTestController               :637  | [reactor-http-nio-2] item: 2
+        return Mono.empty();
+    }
+
+    @GetMapping("/subscribe/subject/publishSubjectThrottling")
+    public Mono<String> subscribePublishSubjectThrottling() throws Exception {
+        PublishSubject<Integer> subject = PublishSubject.create();
+
+        subject.throttleFirst(5, TimeUnit.SECONDS, Schedulers.computation())
+            .observeOn(Schedulers.computation())
+            .subscribe(integerSingleObserver);
+
+        for (int i = 0; i < 10; i++) {
+            Thread.sleep(2000);
+            subject.onNext(i);
+        }
+
+        subject.onComplete();
+        subject.onNext(10);
+
+        //2019-12-16 14:05:25 | INFO  | RxJavaTestController               :638  | [RxComputationThreadPool-1] item: 0
+        //2019-12-16 14:05:31 | INFO  | RxJavaTestController               :638  | [RxComputationThreadPool-1] item: 3
+        //2019-12-16 14:05:37 | INFO  | RxJavaTestController               :638  | [RxComputationThreadPool-1] item: 6
+        //2019-12-16 14:05:43 | INFO  | RxJavaTestController               :638  | [RxComputationThreadPool-1] item: 9
         return Mono.empty();
     }
 
