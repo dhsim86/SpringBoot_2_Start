@@ -16,7 +16,7 @@ public class HelloController {
 
     @RequestMapping("/")
     String home() {
-        return "jenkins webhook test2!";
+        return "jenkins webhook test3!";
     }
 
     @GetMapping("/optional/test")
