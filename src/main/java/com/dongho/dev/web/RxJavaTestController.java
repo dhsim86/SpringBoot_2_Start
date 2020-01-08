@@ -1,6 +1,8 @@
 package com.dongho.dev.web;
 
 import io.reactivex.*;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
@@ -11,9 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.adapter.rxjava.RxJava2Adapter;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -684,6 +684,45 @@ public class RxJavaTestController {
         //2019-12-16 14:05:37 | INFO  | RxJavaTestController               :638  | [RxComputationThreadPool-1] item: 6
         //2019-12-16 14:05:43 | INFO  | RxJavaTestController               :638  | [RxComputationThreadPool-1] item: 9
         return Mono.empty();
+    }
+
+    @GetMapping("flowable/emptyTest")
+    public Mono<String> flowableEmptyTest() throws Exception {
+        //List<String> stringList = Arrays.asList("true", "true"); //-> true
+        List<String> stringList = Arrays.asList("true", "false"); //-> false
+        //List<String> stringList = Collections.EMPTY_LIST; //-> true
+
+        boolean result = Single.fromCallable(() -> stringList)
+            .flatMapPublisher(list -> Flowable.fromIterable(list))
+            .parallel()
+            .runOn(Schedulers.computation())
+            .map(Boolean::valueOf)
+            .sequential()
+            .all(Boolean::booleanValue)
+            .onErrorResumeNext(Single.just(false))
+            .blockingGet();
+
+        return Mono.just(Boolean.toString(result));
+    }
+
+    @GetMapping("flowable/emptyTest2")
+    public Mono<String> flowableEmptyTest2() throws Exception {
+        //List<String> stringList = Arrays.asList("true", "true"); //-> true
+        //List<String> stringList = Arrays.asList("true", "false"); //-> false
+        List<String> stringList = Collections.EMPTY_LIST; //-> false
+
+        boolean result = Single.fromCallable(() -> stringList)
+            .flatMapPublisher(list -> Flowable.fromIterable(list))
+            .parallel()
+            .runOn(Schedulers.computation())
+            .map(Boolean::valueOf)
+            .sequential()
+            .switchIfEmpty(Flowable.fromArray(false))
+            .onErrorReturnItem(false)
+            .all(Boolean::booleanValue)
+            .blockingGet();
+
+        return Mono.just(Boolean.toString(result));
     }
 
 }
