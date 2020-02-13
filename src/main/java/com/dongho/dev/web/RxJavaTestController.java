@@ -482,6 +482,22 @@ public class RxJavaTestController {
         return Mono.empty();
     }
 
+    @GetMapping("/subscribe/computation")
+    public Mono<String> subscribeComputation() {
+
+        Single.fromCallable(() -> "test")
+            .doOnSuccess(s -> log.info("success: {}", s))
+            .subscribeOn(Schedulers.computation())
+            .subscribe();
+
+        log.info("after subscribe");
+
+        // [reactor-http-nio-2] after subscribe
+        // [RxComputationThreadPool-2] success: test
+
+        return Mono.empty();
+    }
+
     @GetMapping("/subscribe/normalDelay")
     public Mono<String> subscribeNormalDelay() {
 
