@@ -3,9 +3,9 @@ spring:
     active:
       - local
   datasource:
-    url: jdbc:mysql://10.161.64.68:13306?useUnicode=true&characterEncoding=UTF-8&useSSL=true&verifyServerCertificate=false
-    username: tc_rds
-    password: rds!#%135
+    url: jdbc:mysql://sandbox-pg-db.ay1.krane.9rum.cc:3306/reseller_pg?cacheServerConfiguration=true&zeroDateTimeBehavior=convertToNull&autoReconnect=false
+    username: resellerpg
+    password: resellerpg
   jpa:
     properties:
       hibernate:

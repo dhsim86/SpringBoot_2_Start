@@ -1,2 +1,6 @@
 fixtures:
-  test: test
+  payment:
+    main-method-amount: 1000
+    created-at: 2021-07-01T08:59:01.123
+    updated-at: 2021-07-01T08:59:04.456
+    approved-at: 2021-07-01T08:59:03.789
