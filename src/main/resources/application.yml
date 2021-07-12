@@ -16,5 +16,21 @@ spring:
         order_updates: true
     open-in-view: true
 
+logging:
+  level:
+    org:
+      hibernate:
+        SQL:
+          debug
+        type:
+          descriptor:
+            sql:
+              BasicBinder: debug
+      springframework:
+        transaction: DEBUG
+        orm:
+          jpa: DEBUG
+
+
 server:
   port: 8080
